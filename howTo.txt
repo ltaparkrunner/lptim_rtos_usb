@@ -1,0 +1,26 @@
+
+	The problem: lptim_rtos\lptim_rtos.axf: Error: L6200E: Symbol SysTick_Handler multiply defined (by cmsis_os2.o and stm32l4xx_it.o).
+	small difference: cmsis_os2.c -> SysTick->CTRL;         stm32l4xx_it.c -> HAL_IncTick(); => #define USE_CUSTOM_SYSTICK_HANDLER_IMPLEMENTATION  1 =>
+	=> stm32l4xx_it.c -> HAL_IncTick();
+	
+	I haven't programm sx1276 chip, it's wrong, so proper sx1276 programming have to decrease power consumption.
+	
+	if like in superlowPower_lse => 200мкА
+	
+	в LPTIM-tick => vUlpInit(); => MX_GPIO_Init();  MX_USART2_UART_Init();  MX_RTC_Init();    MX_LPTIM2_Init();
+	создает два таймера => ledTimerCallback,	resultsTimerCallback
+	и два потока =>  mainOsTask и vTttOsTask
+	vTttOsTask => test tick timing
+	
+	ledIntervalMs = 5000UL;
+    vTttSetEvalInterval( portMAX_DELAY );
+    osTimerStop(resultsTimerHandle);
+	osTimerStart(ledTimerHandle, ledIntervalMs);
+    xTaskNotify(mainTaskHandle, NOTIFICATION_FLAG_LED_BLIP, eSetBits);
+	
+..\lptimTick\Source\lptimTick.c(478): warning:  #223-D: function "vUlpPreSleepProcessing" declared implicitly
+           
+onfigPRE_SLEEP_PROCESSING( xModifiableIdleTime );
+..\lptimTick\Source\lptimTick.c(487): warning:  #223-D: function "vUlpPostSleepProcessing" declared implicitly
+           
+onfigPOST_SLEEP_PROCESSING( (const TickType_t)xExpectedIdleTime );
